@@ -6,7 +6,7 @@ import redis
 app = Flask(__name__)
 cache = redis.StrictRedis(host = 'redis', port = 6379, db = 0)
 salt = "s4lt3and0L0L"
-default_name = 'deep'
+default_name = "deep"
 
 @app.route('/', methods=['GET', 'POST'])
 def mainpage():
@@ -25,11 +25,13 @@ def mainpage():
         <form method="POST" class="p-3 mt-3">
             <div class="form-field d-flex align-items-center">
                 <span class="far fa-user"></span>
-                 <input type="text" name="name" placeholder="Tu nombre" value="{0}">
+                 <input type="text" name="name" placeholder="Tu nombre">
             </div>
             <button class="btn mt-3">Enviar</button>
         </form>			
 		<br><br><center><p>Avatar:<br>
+        	<img src="/multiavatar/{1}" height=80 width=80/>
+			'''.format(name, name_hash) + '''
 			<img src="/monster/{1}"/>
 			'''.format(name, name_hash)
 	footer = '</center></div></body></html>'
@@ -146,7 +148,7 @@ body {
 
 
 @app.route('/monster/<name>')
-def get_identicon(name):
+def get_monster(name):
 	image = cache.get(name)
 	if image is None:
 		print ("Cache miss", flush=True)
@@ -154,7 +156,17 @@ def get_identicon(name):
 		image = r.content
 		cache.set(name, image)
 	return Response(image, mimetype='image/png')
-		
+
+@app.route('/multiavatar/<name>')
+def get_multiavatar(name):
+	image = cache.get(name)
+	if image is None:
+		print ("Cache miss", flush=True)
+		r = requests.get('https://api.multiavatar.com/' + name + '.png')
+		image = r.content
+		cache.set(name, image)
+	return Response(image, mimetype='image/png')
+
 if __name__ == '__main__':
 	app.run(debug=True, host='0.0.0.0')
 
