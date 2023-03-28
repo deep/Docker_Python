@@ -1,5 +1,6 @@
-FROM python:3.4
-RUN pip install Flask==0.10.1
+FROM python:latest
+RUN pip install --upgrade pip
+RUN pip install Flask requests redis multiavatar
 WORKDIR /app
 COPY app /app
-CMD ["python", "identidock.py"]
+CMD ["python", "avatares.py"]
